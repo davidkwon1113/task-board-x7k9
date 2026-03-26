@@ -99,7 +99,7 @@ body{
 .s-done{color:var(--gray)}
 
 .task .name{color:var(--text)}
-.task .target{color:var(--muted);margin-left:8px}
+.task .target{color:var(--muted)}
 
 /* detail — indented tree lines, always toggled via click */
 .detail{
@@ -212,7 +212,7 @@ function renderOutput(){
         const row=document.createElement('div');
         row.className='task';
         const cls=SC[task.st]||'';
-        row.innerHTML=`<span class="num">${task.n}.</span><span class="status ${cls}">[${SL[task.st]}]</span> <span class="name">${esc(task.name)}</span>${task.t?` <span class="target">${task.t}</span>`:''}`;
+        row.innerHTML=`<span class="num">${task.n}.</span><span class="status ${cls}">[${SL[task.st]}]</span> ${task.t?`<span class="target">[${task.t}]</span> `:''}<span class="name">${esc(task.name)}</span>`;
 
         const hasDetail=task.g||task.k||task.notes;
         if(hasDetail){
