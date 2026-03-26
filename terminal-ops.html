@@ -4,436 +4,241 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>LINE Pay Thailand -- Task Board</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<title>task-board — LINE Pay Thailand</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box}
 :root{
---bg:#0D1117;
---surface:#161B22;
---text-primary:#C9D1D9;
---text-secondary:#8B949E;
---border:#30363D;
---accent:#58A6FF;
---status-not-yet:#F85149;
---status-in-plan:#D29922;
---status-in-dev:#3FB950;
---status-in-qa:#BC8CFF;
---status-done:#8B949E;
+  --bg:#0D1117;
+  --surface:#161B22;
+  --text:#C9D1D9;
+  --dim:#484F58;
+  --muted:#8B949E;
+  --border:#30363D;
+  --blue:#58A6FF;
+  --red:#F85149;
+  --amber:#D29922;
+  --green:#3FB950;
+  --purple:#BC8CFF;
+  --gray:#8B949E;
 }
 html{font-size:13px}
 body{
-background:var(--bg);
-color:var(--text-primary);
-font-family:'JetBrains Mono',monospace;
-line-height:1.5;
-padding:16px;
-min-height:100vh;
-}
-a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:underline}
-
-/* header */
-.header{
-border-bottom:1px solid var(--border);
-padding-bottom:12px;
-margin-bottom:16px;
-}
-.header h1{
-font-size:1rem;
-font-weight:700;
-color:var(--text-primary);
-display:inline;
-}
-.header h1 .cursor{
-display:inline-block;
-width:8px;
-height:1rem;
-background:var(--text-primary);
-margin-left:4px;
-vertical-align:text-bottom;
-animation:blink 1s step-end infinite;
-}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.header .meta{
-color:var(--text-secondary);
-font-size:0.85rem;
-margin-top:4px;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'JetBrains Mono',monospace;
+  line-height:1.6;
+  padding:1lh 2ch;
+  max-width:80ch;
+  margin:0 auto;
 }
 
-/* filter bar */
-.filter-bar{
-display:flex;
-flex-wrap:wrap;
-gap:4px;
-margin-bottom:16px;
-padding:8px;
-border:1px solid var(--border);
-background:var(--surface);
-}
-.filter-btn{
-font-family:'JetBrains Mono',monospace;
-font-size:0.85rem;
-background:transparent;
-color:var(--text-secondary);
-border:1px solid var(--border);
-padding:2px 8px;
-cursor:pointer;
-border-radius:0;
-transition:color .15s,border-color .15s;
-}
-.filter-btn:hover{color:var(--text-primary);border-color:var(--text-primary)}
-.filter-btn.active{color:var(--bg);background:var(--text-primary);border-color:var(--text-primary)}
-.filter-btn .count{color:var(--text-secondary);font-size:0.75rem}
-.filter-btn.active .count{color:var(--bg)}
+/* everything is text output — no boxes, no panels */
+.prompt{color:var(--muted)}
+.cmd{color:var(--text)}
+.accent{color:var(--blue)}
+.dim{color:var(--dim)}
+.muted{color:var(--muted)}
 
-/* person section */
-.person-section{
-border:1px solid var(--border);
-margin-bottom:12px;
-}
-.person-header{
-background:var(--surface);
-padding:6px 12px;
-cursor:pointer;
-display:flex;
-align-items:center;
-gap:8px;
-user-select:none;
-border-bottom:1px solid var(--border);
-}
-.person-header:hover{background:#1C2128}
-.person-header .toggle{
-color:var(--text-secondary);
-font-size:0.85rem;
-width:16px;
-text-align:center;
-flex-shrink:0;
-}
-.person-header h2{
-font-size:0.9rem;
-font-weight:700;
-color:var(--accent);
-}
-.person-header .task-count{
-color:var(--text-secondary);
-font-size:0.8rem;
-margin-left:auto;
-}
-.person-body{padding:0}
-.person-body.collapsed{display:none}
-
-/* sub-section */
-.sub-section{
-border-bottom:1px solid var(--border);
-}
-.sub-section:last-child{border-bottom:none}
-.sub-header{
-padding:4px 12px;
-color:var(--text-secondary);
-font-size:0.8rem;
-background:var(--bg);
-border-bottom:1px solid var(--border);
+/* summary line */
+.summary{
+  margin:0.5lh 0 1lh;
+  font-size:0.85rem;
 }
 
-/* task row */
-.task-row{
-border-bottom:1px solid var(--border);
-cursor:pointer;
-transition:background .1s;
+/* filter — styled as command prompt, not buttons */
+.filter-line{
+  margin-bottom:1lh;
+  font-size:0.85rem;
 }
-.task-row:last-child{border-bottom:none}
-.task-row:hover{background:#1C2128}
-.task-summary{
-display:grid;
-grid-template-columns:28px 1fr auto auto;
-gap:8px;
-align-items:baseline;
-padding:4px 12px;
+.filter-line .f-opt{
+  color:var(--dim);
+  cursor:pointer;
+  padding:0 2px;
+  transition:color .1s;
 }
-.task-num{
-color:var(--text-secondary);
-font-size:0.8rem;
-text-align:right;
-}
-.task-name{
-color:var(--text-primary);
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-}
-.task-target{
-color:var(--text-secondary);
-font-size:0.8rem;
-white-space:nowrap;
-}
-.task-status{
-font-weight:700;
-font-size:0.8rem;
-white-space:nowrap;
-}
-.status-not-yet{color:var(--status-not-yet)}
-.status-in-plan{color:var(--status-in-plan)}
-.status-in-dev{color:var(--status-in-dev)}
-.status-in-qa{color:var(--status-in-qa)}
-.status-done{color:var(--status-done)}
+.filter-line .f-opt:hover{color:var(--muted)}
+.filter-line .f-opt.active{color:var(--bg);background:var(--text)}
 
-/* task detail */
-.task-detail{
-display:none;
-padding:4px 12px 8px 48px;
-color:var(--text-secondary);
-font-size:0.85rem;
-border-top:1px dashed var(--border);
+/* section dividers — ANSI-style, no markdown */
+.section-head{
+  margin-top:1.5lh;
+  margin-bottom:0.25lh;
+  font-size:0.85rem;
+  padding-bottom:0.125lh;
 }
-.task-detail .detail-row{
-margin-bottom:2px;
-}
-.task-detail .label{color:var(--text-secondary)}
-.task-detail .value{color:var(--text-primary)}
-.task-row.expanded .task-detail{display:block}
+.section-head .owner{color:var(--text);font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.section-head .count{color:var(--dim);font-weight:400}
 
-/* stats bar */
-.stats-bar{
-display:flex;
-gap:16px;
-flex-wrap:wrap;
-padding:8px 12px;
-border:1px solid var(--border);
-background:var(--surface);
-margin-bottom:16px;
-font-size:0.85rem;
+.sub-head{
+  color:var(--dim);
+  font-size:0.8rem;
+  margin:1lh 0 0.25lh;
 }
-.stat-item .stat-label{color:var(--text-secondary)}
-.stat-item .stat-value{font-weight:700}
+
+/* task rows — pure text, no boxes */
+.task{
+  padding:2px 0;
+  font-size:0.85rem;
+  cursor:pointer;
+}
+
+.task .num{
+  display:inline-block;
+  width:3ch;
+  text-align:right;
+  color:var(--dim);
+  margin-right:1ch;
+}
+
+.task .status{font-weight:700;display:inline-block;width:11ch}
+.s-not-yet{color:var(--red)}
+.s-in-plan{color:var(--amber)}
+.s-in-dev{color:var(--green)}
+.s-in-qa{color:var(--purple)}
+.s-done{color:var(--gray)}
+
+.task .name{color:var(--text)}
+.task .target{color:var(--muted);margin-left:8px}
+
+/* detail — indented tree lines, always toggled via click */
+.detail{
+  display:none;
+  color:var(--muted);
+  font-size:0.8rem;
+  padding-left:4ch;
+}
+.detail .tree{color:var(--dim)}
+.detail .val{color:var(--text)}
+.task.open .detail{display:block}
+
+/* empty */
+.empty{color:var(--dim);font-size:0.8rem;padding-left:4ch}
 
 /* footer */
 .footer{
-border-top:1px solid var(--border);
-padding-top:8px;
-margin-top:16px;
-color:var(--text-secondary);
-font-size:0.75rem;
-}
-
-/* responsive */
-@media(max-width:700px){
-.task-summary{
-grid-template-columns:24px 1fr;
-gap:2px 8px;
-}
-.task-target{grid-column:2;font-size:0.75rem}
-.task-status{grid-column:2}
-.stats-bar{flex-direction:column;gap:4px}
+  margin-top:1.5lh;
+  padding-top:0.25lh;
+  /* no px borders — terminal uses text separators */
+  color:var(--dim);
+  font-size:0.75rem;
 }
 </style>
 </head>
 <body>
 
-<div class="header">
-<h1>$ line-pay-th --task-board<span class="cursor"></span></h1>
-<div class="meta">LINE Pay Thailand | PM Task Board | last sync: 2026-03-26</div>
-</div>
-
-<div class="stats-bar" id="statsBar"></div>
-
-<div class="filter-bar" id="filterBar"></div>
-
-<div id="board"></div>
-
-<div class="footer">
-<div>$ exit 0</div>
-</div>
+<div class="prompt">$ <span class="cmd">task-board</span> <span class="muted">--project</span> <span class="accent">line-pay-th</span> <span class="muted">--mode</span> pm</div>
+<div class="summary" id="summary"></div>
+<div class="filter-line" id="filterLine"></div>
+<div id="output"></div>
+<div class="footer"><span class="dim">────────────────────────────────────────</span></div>
+<div class="footer">$ <span class="muted">exit 0</span></div>
 
 <script>
-const TASKS = [
-  // David - Key Tasks
-  {person:"David",section:"Key Tasks",num:1,name:"New Point Card",status:"IN PLAN",target:"2026-08",goal:"Release new Kbank point card",kpi:"Card AU 100,000",notes:"Under schedule fix with Kbank, dependency with report file format, need to check NEON I/F, finalize UX flow"},
-  {person:"David",section:"Key Tasks",num:2,name:"Core Separation -- Risk Management",status:"IN DEV",target:"2026-05",goal:"Separate risk mgmt with LIAM admin",kpi:"On-time delivery",notes:"DB release done, RC QA 3rd-4th week April, Go-live May 2026"},
-  {person:"David",section:"Key Tasks",num:3,name:"Core Separation -- Payfac/Cobrand/Salmon",status:"IN DEV",target:"2026-04",goal:"Separate payfac/cobrand/salmon",kpi:"On-time delivery",notes:"Cobrand IP: beta done, real TBD. Domain: TBD. Salmon: decided not to proceed"},
-  {person:"David",section:"Key Tasks",num:4,name:"Core Separation -- Settlement",status:"IN PLAN",target:"2026-06",goal:"Separate settlement with LIAM admin",kpi:"On-time delivery",notes:"Under review whether to include in central migration"},
-  {person:"David",section:"Key Tasks",num:5,name:"Core Separation -- Central",status:"NOT YET",target:"2026-09",goal:"Separate central payment system",kpi:"On-time delivery",notes:null},
-  {person:"David",section:"Key Tasks",num:6,name:"Cross-Border Payment",status:"IN PLAN",target:"2026-07",goal:"Apply traveler component",kpi:"On-time delivery",notes:"Need to push LPP, suggest sustain current regkey payment"},
-  {person:"David",section:"Key Tasks",num:7,name:"Apple Hub",status:"IN QA",target:"2026-04",goal:"Gaining LINE Pay GMV from Apple Store",kpi:"TBD",notes:"Need to finish Apple QA, related to mobile security banking features"},
-  {person:"David",section:"Key Tasks",num:8,name:"Adding UTS for Binding Flow",status:"IN PLAN",target:"2026-05",goal:"Know drop-off rate",kpi:"On-time delivery",notes:"Screen view done, will add events, workflow check done"},
-  {person:"David",section:"Key Tasks",num:9,name:"BIN Switching",status:"IN PLAN",target:"2026 Q4",goal:"Auto-select cheaper MDR",kpi:"Reduce 6M THB/year",notes:"Gaining requirement from commercial team"},
-  {person:"David",section:"Key Tasks",num:10,name:"SAP Migration",status:"IN PLAN",target:"2027 Q1",goal:"Migration NEON -> Accounting Hub",kpi:"On-time delivery",notes:"Check schedule with accounting team"},
-  {person:"David",section:"Key Tasks",num:11,name:"Merchant Squad Sprint",status:"IN PLAN",target:"2026-04",goal:"Sprint-based production",kpi:"On-time delivery",notes:"Discussion with Chris & Som"},
-  {person:"David",section:"Key Tasks",num:12,name:"UX/UI Design Onboarding",status:"IN PLAN",target:"2026-04",goal:"UX/UI workflow LPP -> LPK",kpi:"TBD",notes:null},
-  // David - Security Reviews
-  {person:"David",section:"Security Reviews",num:1,name:"Allow getUserInfo API for OpenAI",status:"DONE",target:null,goal:null,kpi:null,notes:null},
-  {person:"David",section:"Security Reviews",num:2,name:"Merchant LIAM menu permissions",status:"DONE",target:null,goal:null,kpi:null,notes:null},
-  // Nuri - Key Tasks
-  {person:"Nuri",section:"Key Tasks",num:1,name:"WebKYC",status:"IN PLAN",target:null,goal:null,kpi:null,notes:null},
-  {person:"Nuri",section:"Key Tasks",num:2,name:"BNPL Onboarding",status:"IN PLAN",target:null,goal:null,kpi:null,notes:null},
-  {person:"Nuri",section:"Key Tasks",num:3,name:"Wallet Passthrough",status:"IN PLAN",target:null,goal:null,kpi:null,notes:null},
-  {person:"Nuri",section:"Key Tasks",num:4,name:"Payment Binding Flow",status:"IN PLAN",target:null,goal:null,kpi:null,notes:null},
-  {person:"Nuri",section:"Key Tasks",num:5,name:"Risk Management Service",status:"IN PLAN",target:null,goal:null,kpi:null,notes:null},
-  // Nuri - Security Reviews (none)
-  {person:"Nuri",section:"Security Reviews",num:0,name:"-- none --",status:null,target:null,goal:null,kpi:null,notes:null,placeholder:true},
+const TASKS=[
+{p:"David",s:"Key Tasks",n:1,name:"New Point Card",st:"IN PLAN",t:"2026-08",g:"Release new Kbank point card",k:"Card AU 100,000",notes:["Under schedule fix with Kbank","├─ dependency with report file format","├─ need to check NEON I/F","└─ finalize UX flow"]},
+{p:"David",s:"Key Tasks",n:2,name:"Core Separation — Risk Management",st:"IN DEV",t:"2026-05",g:"Separate risk mgmt with LIAM admin",k:"On-time delivery",notes:["Under schedule fix","├─ DB release: done","├─ RC QA: 3rd–4th week April","└─ Go-live: May 2026"]},
+{p:"David",s:"Key Tasks",n:3,name:"Core Separation — Payfac/Cobrand/Salmon",st:"IN DEV",t:"2026-04",g:"Separate payfac/cobrand/salmon",k:"On-time delivery",notes:["Cobrand IP: beta done, real TBD","├─ Domain: TBD","└─ Salmon: decided not to proceed"]},
+{p:"David",s:"Key Tasks",n:4,name:"Core Separation — Settlement",st:"IN PLAN",t:"2026-06",g:"Separate settlement with LIAM admin",k:"On-time delivery",notes:["Under review schedule","└─ whether to include in central migration"]},
+{p:"David",s:"Key Tasks",n:5,name:"Core Separation — Central",st:"NOT YET",t:"2026-09",g:"Separate central payment system",k:"On-time delivery",notes:null},
+{p:"David",s:"Key Tasks",n:6,name:"Cross-Border Payment",st:"IN PLAN",t:"2026-07",g:"Apply traveler component",k:"On-time delivery",notes:["Need to push LPP","└─ suggest sustain current regkey payment"]},
+{p:"David",s:"Key Tasks",n:7,name:"Apple Hub",st:"IN QA",t:"2026-04",g:"Gaining LINE Pay GMV from Apple Store",k:"TBD",notes:["Need to finish Apple QA","└─ related to mobile security banking features"]},
+{p:"David",s:"Key Tasks",n:8,name:"Adding UTS for Binding Flow",st:"IN PLAN",t:"2026-05",g:"Know drop-off rate",k:"On-time delivery",notes:["Screen view: done","├─ will add events","├─ workflow check: done","└─ might check by server API data"]},
+{p:"David",s:"Key Tasks",n:9,name:"BIN Switching",st:"IN PLAN",t:"2026 Q4",g:"Auto-select cheaper MDR",k:"Reduce 6M THB/year",notes:["Gaining requirement from commercial team","└─ need to discuss with core payment engineers"]},
+{p:"David",s:"Key Tasks",n:10,name:"SAP Migration",st:"IN PLAN",t:"2027 Q1",g:"Migration NEON → Accounting Hub",k:"On-time delivery",notes:["└─ check schedule with accounting team"]},
+{p:"David",s:"Key Tasks",n:11,name:"Merchant Squad Sprint",st:"IN PLAN",t:"2026-04",g:"Sprint-based production",k:"On-time delivery",notes:["└─ discussion with Chris & Som"]},
+{p:"David",s:"Key Tasks",n:12,name:"UX/UI Design Onboarding",st:"IN PLAN",t:"2026-04",g:"UX/UI workflow LPP → LPK",k:"TBD",notes:null},
+{p:"David",s:"Security Reviews",n:1,name:"Allow getUserInfo API for OpenAI",st:"DONE",t:null,g:null,k:null,notes:null},
+{p:"David",s:"Security Reviews",n:2,name:"Merchant LIAM menu permissions",st:"DONE",t:null,g:null,k:null,notes:null},
+{p:"Nuri",s:"Key Tasks",n:1,name:"WebKYC",st:"IN PLAN",t:null,g:null,k:null,notes:null},
+{p:"Nuri",s:"Key Tasks",n:2,name:"BNPL Onboarding",st:"IN PLAN",t:null,g:null,k:null,notes:null},
+{p:"Nuri",s:"Key Tasks",n:3,name:"Wallet Passthrough",st:"IN PLAN",t:null,g:null,k:null,notes:null},
+{p:"Nuri",s:"Key Tasks",n:4,name:"Payment Binding Flow",st:"IN PLAN",t:null,g:null,k:null,notes:null},
+{p:"Nuri",s:"Key Tasks",n:5,name:"Risk Management Service",st:"IN PLAN",t:null,g:null,k:null,notes:null},
 ];
 
-const STATUS_ORDER = ["NOT YET","IN PLAN","IN DEV","IN QA","DONE"];
-const STATUS_META = {
-  "NOT YET":{cls:"status-not-yet",label:"[NOT YET]"},
-  "IN PLAN":{cls:"status-in-plan",label:"[IN PLAN]"},
-  "IN DEV":{cls:"status-in-dev",label:"[IN DEV]"},
-  "IN QA":{cls:"status-in-qa",label:"[IN QA]"},
-  "DONE":{cls:"status-done",label:"[DONE]"},
-};
+const STS=["NOT YET","IN PLAN","IN DEV","IN QA","DONE"];
+const SC={"NOT YET":"s-not-yet","IN PLAN":"s-in-plan","IN DEV":"s-in-dev","IN QA":"s-in-qa","DONE":"s-done"};
+const SL={"NOT YET":"NOT_YET","IN PLAN":"IN_PLAN","IN DEV":"IN_DEV","IN QA":"IN_QA","DONE":"DONE"};
 
-const realTasks = TASKS.filter(t=>!t.placeholder);
+// total counts
+const TC={};
+STS.forEach(s=>{TC[s]=TASKS.filter(t=>t.st===s).length});
 
-// counts (always total, not filtered)
-const totalCounts = {ALL:realTasks.length};
-STATUS_ORDER.forEach(s=>{totalCounts[s]=realTasks.filter(t=>t.status===s).length});
+// summary
+document.getElementById('summary').innerHTML=
+  STS.map(s=>`<span class="${SC[s]}">[${SL[s]}:${String(TC[s]).padStart(2,'0')}]</span>`).join(' ')+
+  ` <span class="muted">total:${TASKS.length}</span>`;
 
-// stats
-function renderStats(){
-  const bar=document.getElementById('statsBar');
-  const items=[
-    {label:"total",value:realTasks.length},
-    {label:"owners",value:[...new Set(realTasks.map(t=>t.person))].length},
-    ...STATUS_ORDER.map(s=>({label:s.toLowerCase().replace(/ /g,'-'),value:totalCounts[s],cls:STATUS_META[s].cls}))
-  ];
-  bar.innerHTML=items.map(i=>`<span class="stat-item"><span class="stat-label">${i.label}:</span> <span class="stat-value ${i.cls||''}">${i.value}</span></span>`).join('');
-}
-
-// filters
-let activeFilter = "ALL";
-function renderFilters(){
-  const bar=document.getElementById('filterBar');
-  const filters=["ALL",...STATUS_ORDER];
-  bar.innerHTML=filters.map(f=>{
-    const count=f==="ALL"?totalCounts.ALL:totalCounts[f];
-    const meta=STATUS_META[f];
-    const active=f===activeFilter?'active':'';
-    return `<button class="filter-btn ${active}" data-filter="${f}">${f==="ALL"?"ALL":meta.label} <span class="count">(${count})</span></button>`;
-  }).join('');
-  bar.querySelectorAll('.filter-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      activeFilter=btn.dataset.filter;
-      renderFilters();
-      renderBoard();
-    });
+// filter
+let F="ALL";
+function renderFilter(){
+  const fl=document.getElementById('filterLine');
+  const opts=["ALL",...STS];
+  fl.innerHTML='<span class="prompt">$ filter</span> '+opts.map(o=>{
+    const label=o==="ALL"?"--all":`--${SL[o]||o}`.toLowerCase();
+    const cls=o===F?'f-opt active':'f-opt';
+    return `<span class="${cls}" data-f="${o}">${label}</span>`;
+  }).join(' ');
+  fl.querySelectorAll('.f-opt').forEach(el=>{
+    el.addEventListener('click',()=>{F=el.dataset.f;renderFilter();renderOutput()});
   });
 }
 
-// build board
-function renderBoard(){
-  const board=document.getElementById('board');
-  board.innerHTML='';
-
-  const persons=[...new Set(TASKS.map(t=>t.person))];
+function renderOutput(){
+  const out=document.getElementById('output');
+  out.innerHTML='';
+  const persons=[...new Set(TASKS.map(t=>t.p))];
   persons.forEach(person=>{
-    const personTasks=TASKS.filter(t=>t.person===person);
-    const sections=[...new Set(personTasks.map(t=>t.section))];
+    const pt=TASKS.filter(t=>t.p===person);
+    const sections=[...new Set(pt.map(t=>t.s))];
 
-    const sec=document.createElement('div');
-    sec.className='person-section';
+    const h=document.createElement('div');
+    h.className='section-head';
+    h.innerHTML=`<span class="owner">${person}</span> <span class="count">${pt.length} tasks</span>`;
+    out.appendChild(h);
 
-    // count visible real tasks for this person
-    const personReal=personTasks.filter(t=>!t.placeholder);
-    const personCount=personReal.length;
+    sections.forEach(sec=>{
+      let tasks=pt.filter(t=>t.s===sec);
+      if(F!=="ALL") tasks=tasks.filter(t=>t.st===F);
+      if(tasks.length===0) return;
 
-    // header
-    const hdr=document.createElement('div');
-    hdr.className='person-header';
-    hdr.innerHTML=`<span class="toggle">-</span><h2># ${person}</h2><span class="task-count">${personCount} tasks</span>`;
-    sec.appendChild(hdr);
+      const sh=document.createElement('div');
+      sh.className='sub-head';
+      sh.textContent=sec.toLowerCase().replace(/ /g,'_');
+      out.appendChild(sh);
 
-    const body=document.createElement('div');
-    body.className='person-body';
-
-    sections.forEach(sectionName=>{
-      const sectionTasks=TASKS.filter(t=>t.person===person&&t.section===sectionName);
-
-      // filter
-      let visible=sectionTasks;
-      if(activeFilter!=="ALL"){
-        visible=sectionTasks.filter(t=>t.status===activeFilter);
-      }
-      // always show placeholder if section would otherwise be empty
-      if(visible.length===0) return;
-
-      const subSec=document.createElement('div');
-      subSec.className='sub-section';
-
-      const subHdr=document.createElement('div');
-      subHdr.className='sub-header';
-      subHdr.textContent=`## ${sectionName}`;
-      subSec.appendChild(subHdr);
-
-      visible.forEach(task=>{
-        if(task.placeholder){
-          const row=document.createElement('div');
-          row.className='task-row';
-          row.innerHTML=`<div class="task-summary" style="grid-template-columns:1fr"><span class="task-name" style="color:var(--text-secondary)">${task.name}</span></div>`;
-          subSec.appendChild(row);
-          return;
-        }
-        const meta=STATUS_META[task.status]||{cls:'',label:''};
+      tasks.forEach(task=>{
         const row=document.createElement('div');
-        row.className='task-row';
+        row.className='task';
+        const cls=SC[task.st]||'';
+        row.innerHTML=`<span class="num">${task.n}.</span><span class="status ${cls}">[${SL[task.st]}]</span> <span class="name">${esc(task.name)}</span>${task.t?` <span class="target">${task.t}</span>`:''}`;
 
-        let summaryHTML=`
-          <span class="task-num">${task.num}.</span>
-          <span class="task-name">${esc(task.name)}</span>
-          <span class="task-target">${task.target||''}</span>
-          <span class="task-status ${meta.cls}">${meta.label}</span>
-        `;
-        const summary=document.createElement('div');
-        summary.className='task-summary';
-        summary.innerHTML=summaryHTML;
-        row.appendChild(summary);
-
-        // detail
-        const hasDetail=task.goal||task.kpi||task.notes;
+        const hasDetail=task.g||task.k||task.notes;
         if(hasDetail){
-          const detail=document.createElement('div');
-          detail.className='task-detail';
-          let dHTML='';
-          if(task.goal) dHTML+=`<div class="detail-row"><span class="label">goal: </span><span class="value">${esc(task.goal)}</span></div>`;
-          if(task.kpi) dHTML+=`<div class="detail-row"><span class="label">kpi:  </span><span class="value">${esc(task.kpi)}</span></div>`;
-          if(task.notes) dHTML+=`<div class="detail-row"><span class="label">note: </span><span class="value">${esc(task.notes)}</span></div>`;
-          detail.innerHTML=dHTML;
-          row.appendChild(detail);
-
-          row.addEventListener('click',()=>{
-            row.classList.toggle('expanded');
+          const d=document.createElement('div');
+          d.className='detail';
+          let lines=[];
+          if(task.g) lines.push(`<span class="tree">├─</span> goal: <span class="val">${esc(task.g)}</span>`);
+          if(task.k) lines.push(`<span class="tree">${task.notes?'├─':'└─'}</span> kpi:  <span class="val">${esc(task.k)}</span>`);
+          if(task.notes) task.notes.forEach((n,i)=>{
+            lines.push(`<span class="tree">${i===task.notes.length-1&&!task.g&&!task.k?'└─':'│ '}</span> <span class="val">${esc(n)}</span>`);
           });
+          d.innerHTML=lines.join('<br>');
+          row.appendChild(d);
+          row.addEventListener('click',()=>row.classList.toggle('open'));
         }
 
-        subSec.appendChild(row);
+        out.appendChild(row);
       });
-
-      body.appendChild(subSec);
     });
-
-    sec.appendChild(body);
-
-    // collapse toggle
-    hdr.addEventListener('click',()=>{
-      body.classList.toggle('collapsed');
-      hdr.querySelector('.toggle').textContent=body.classList.contains('collapsed')?'+':'-';
-    });
-
-    // only add section if body has children
-    if(body.children.length>0) board.appendChild(sec);
   });
 }
 
-function esc(s){
-  const d=document.createElement('div');
-  d.textContent=s;
-  return d.innerHTML;
-}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
-renderStats();
-renderFilters();
-renderBoard();
+renderFilter();
+renderOutput();
 </script>
 </body>
 </html>
