@@ -763,16 +763,16 @@ function togglePerson(header) {
 
 /* === Counts === */
 function updateCounts() {
-  const statuses = ['not-yet', 'in-plan', 'in-dev', 'in-qa', 'done'];
-  const allCount = document.querySelectorAll('.task-card:not(.hidden)').length;
-
+  /* filter counts always show TOTAL regardless of active filter */
+  const allTotal = document.querySelectorAll('.task-card').length;
   document.querySelectorAll('.filter-btn').forEach(btn => {
     const f = btn.dataset.filter;
-    const count = f === 'all' ? allCount : document.querySelectorAll(`.task-card[data-status="${f}"]:not(.hidden)`).length;
+    const count = f === 'all' ? allTotal : document.querySelectorAll(`.task-card[data-status="${f}"]`).length;
     const span = btn.querySelector('.filter-count');
     if (span) span.textContent = count;
   });
 
+  /* person counts reflect visible cards */
   document.querySelectorAll('[data-count-for]').forEach(el => {
     const person = el.dataset.countFor;
     const section = document.querySelector(`[data-person="${person}"]`);
