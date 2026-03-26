@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>LINE Pay Thailand — Task Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #FFFFFF;
+    --surface: #F7F7F5;
+    --text-primary: #37352F;
+    --text-secondary: #9B9A97;
+    --accent: #2383E2;
+    --accent-light: #E8F0FE;
+    --success: #0F7B6C;
+    --warning: #D9730D;
+    --border: #E3E2DE;
+    --radius: 6px;
+    --shadow-hover: 0 1px 2px rgba(0,0,0,0.04);
+    /* status */
+    --not-yet-bg: #FBE4E4; --not-yet-text: #E03E3E;
+    --in-plan-bg: #FDECC8; --in-plan-text: #D9730D;
+    --in-dev-bg: #DBEDDB; --in-dev-text: #0F7B6C;
+    --in-qa-bg: #E8DEEE; --in-qa-text: #6940A5;
+    --done-bg: #E3E2DE; --done-text: #9B9A97;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* layout */
+  .page { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* page title — Notion style */
+  .page-title {
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .page-subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  /* filter bar */
+  .filters {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .filter-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { background: var(--surface); color: var(--text-primary); }
+  .filter-btn.active { background: var(--text-primary); color: #fff; border-color: var(--text-primary); }
+  .filter-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    margin-left: 4px;
+    opacity: 0.7;
+  }
+
+  /* person section */
+  .person-section { margin-bottom: 32px; }
+  .person-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    padding: 6px 0;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+  .person-toggle:hover .person-name { color: var(--accent); }
+  .toggle-icon {
+    font-size: 12px;
+    color: var(--text-secondary);
+    transition: transform 0.15s;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .person-toggle.collapsed .toggle-icon { transform: rotate(-90deg); }
+  .person-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: color 0.15s;
+  }
+  .person-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .section-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 12px 0 8px 28px;
+  }
+
+  /* cards container */
+  .cards { display: flex; flex-direction: column; gap: 1px; }
+  .cards.hidden { display: none; }
+
+  /* card */
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    margin-bottom: 4px;
+  }
+  .card:hover { box-shadow: var(--shadow-hover); border-color: #d3d2ce; }
+  .card.card-hidden { display: none; }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    flex: 1;
+    min-width: 200px;
+  }
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  /* status pill */
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+  .pill-not-yet   { background: var(--not-yet-bg); color: var(--not-yet-text); }
+  .pill-in-plan   { background: var(--in-plan-bg); color: var(--in-plan-text); }
+  .pill-in-dev    { background: var(--in-dev-bg);  color: var(--in-dev-text); }
+  .pill-in-qa     { background: var(--in-qa-bg);   color: var(--in-qa-text); }
+  .pill-done      { background: var(--done-bg);     color: var(--done-text); }
+
+  .card-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  /* expandable detail */
+  .card-detail {
+    display: none;
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .card.expanded .card-detail { display: block; }
+  .detail-row {
+    display: flex;
+    gap: 8px;
+    font-size: 13px;
+    padding: 2px 0;
+  }
+  .detail-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    min-width: 56px;
+    flex-shrink: 0;
+  }
+  .detail-value { color: var(--text-primary); }
+  .detail-note {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    line-height: 1.6;
+  }
+
+  /* security review compact */
+  .security-list {
+    padding-left: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .security-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    padding: 6px 0;
+  }
+  .security-item .card-title { flex: 1; min-width: auto; }
+  .none-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding: 6px 0 6px 28px;
+    font-style: italic;
+  }
+
+  /* divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0 24px;
+  }
+
+  @media (max-width: 640px) {
+    .page { padding: 32px 16px 60px; }
+    .page-title { font-size: 28px; }
+    .card-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .card-title { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1 class="page-title">LINE Pay Thailand — Task Board</h1>
+  <p class="page-subtitle">PM tracking overview &middot; Updated 2026-03-26</p>
+
+  <!-- Filters -->
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">All <span class="filter-count" id="count-all"></span></button>
+    <button class="filter-btn" data-filter="not-yet">Not Yet <span class="filter-count" id="count-not-yet"></span></button>
+    <button class="filter-btn" data-filter="in-plan">In Plan <span class="filter-count" id="count-in-plan"></span></button>
+    <button class="filter-btn" data-filter="in-dev">In Dev <span class="filter-count" id="count-in-dev"></span></button>
+    <button class="filter-btn" data-filter="in-qa">In QA <span class="filter-count" id="count-in-qa"></span></button>
+    <button class="filter-btn" data-filter="done">Done <span class="filter-count" id="count-done"></span></button>
+  </div>
+
+  <!-- ==================== DAVID ==================== -->
+  <div class="person-section" data-person="david">
+    <button class="person-toggle" onclick="toggleSection(this)">
+      <span class="toggle-icon">&#9660;</span>
+      <span class="person-name">David</span>
+      <span class="person-count" id="david-count"></span>
+    </button>
+
+    <div class="section-content">
+      <div class="section-label">Key Tasks</div>
+      <div class="cards" id="david-tasks">
+
+        <!-- 1 -->
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">New Point Card</span>
+            <div class="card-meta">
+              <span class="pill pill-in-plan">IN PLAN</span>
+              <span class="card-date">2026-08</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">Release new Kbank point card</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">Card AU 100,000</span></div>
+            <p class="detail-note">Under schedule fix with Kbank, dependency with report file format, need to check NEON I/F, finalize UX flow</p>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="card" data-status="in-dev" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">Core Separation — Risk Management</span>
+            <div class="card-meta">
+              <span class="pill pill-in-dev">IN DEV</span>
+              <span class="card-date">2026-05</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">Separate risk mgmt with LIAM admin</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">On-time delivery</span></div>
+            <p class="detail-note">DB release done, RC QA 3rd-4th week April, Go-live May 2026</p>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="card" data-status="in-dev" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">Core Separation — Payfac/Cobrand/Salmon</span>
+            <div class="card-meta">
+              <span class="pill pill-in-dev">IN DEV</span>
+              <span class="card-date">2026-04</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">Separate payfac/cobrand/salmon</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">On-time delivery</span></div>
+            <p class="detail-note">Cobrand IP: beta done, real TBD. Domain: TBD. Salmon: decided not to proceed</p>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">Core Separation — Settlement</span>
+            <div class="card-meta">
+              <span class="pill pill-in-plan">IN PLAN</span>
+              <span class="card-date">2026-06</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">Separate settlement with LIAM admin</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">On-time delivery</span></div>
+            <p class="detail-note">Under review whether to include in central migration</p>
+          </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="card" data-status="not-yet" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">Core Separation — Central</span>
+            <div class="card-meta">
+              <span class="pill pill-not-yet">NOT YET</span>
+              <span class="card-date">2026-09</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">Separate central payment system</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">On-time delivery</span></div>
+          </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">Cross-Border Payment</span>
+            <div class="card-meta">
+              <span class="pill pill-in-plan">IN PLAN</span>
+              <span class="card-date">2026-07</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">Apply traveler component</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">On-time delivery</span></div>
+            <p class="detail-note">Need to push LPP, suggest sustain current regkey payment</p>
+          </div>
+        </div>
+
+        <!-- 7 -->
+        <div class="card" data-status="in-qa" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">Apple Hub</span>
+            <div class="card-meta">
+              <span class="pill pill-in-qa">IN QA</span>
+              <span class="card-date">2026-04</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">Gaining LINE Pay GMV from Apple Store</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">TBD</span></div>
+            <p class="detail-note">Need to finish Apple QA, related to mobile security banking features</p>
+          </div>
+        </div>
+
+        <!-- 8 -->
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">Adding UTS for Binding Flow</span>
+            <div class="card-meta">
+              <span class="pill pill-in-plan">IN PLAN</span>
+              <span class="card-date">2026-05</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">Know drop-off rate</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">On-time delivery</span></div>
+            <p class="detail-note">Screen view done, will add events, workflow check done</p>
+          </div>
+        </div>
+
+        <!-- 9 -->
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">BIN Switching</span>
+            <div class="card-meta">
+              <span class="pill pill-in-plan">IN PLAN</span>
+              <span class="card-date">2026 Q4</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">Auto-select cheaper MDR</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">Reduce 6M THB/year</span></div>
+            <p class="detail-note">Gaining requirement from commercial team</p>
+          </div>
+        </div>
+
+        <!-- 10 -->
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">SAP Migration</span>
+            <div class="card-meta">
+              <span class="pill pill-in-plan">IN PLAN</span>
+              <span class="card-date">2027 Q1</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">Migration NEON &rarr; Accounting Hub</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">On-time delivery</span></div>
+            <p class="detail-note">Check schedule with accounting team</p>
+          </div>
+        </div>
+
+        <!-- 11 -->
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">Merchant Squad Sprint</span>
+            <div class="card-meta">
+              <span class="pill pill-in-plan">IN PLAN</span>
+              <span class="card-date">2026-04</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">Sprint-based production</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">On-time delivery</span></div>
+            <p class="detail-note">Discussion with Chris &amp; Som</p>
+          </div>
+        </div>
+
+        <!-- 12 -->
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">UX/UI Design Onboarding</span>
+            <div class="card-meta">
+              <span class="pill pill-in-plan">IN PLAN</span>
+              <span class="card-date">2026-04</span>
+            </div>
+          </div>
+          <div class="card-detail">
+            <div class="detail-row"><span class="detail-label">Goal</span><span class="detail-value">UX/UI workflow LPP &rarr; LPK</span></div>
+            <div class="detail-row"><span class="detail-label">KPI</span><span class="detail-value">TBD</span></div>
+          </div>
+        </div>
+
+      </div><!-- /david-tasks -->
+
+      <div class="section-label">Security Reviews</div>
+      <div class="cards" id="david-security">
+        <div class="card" data-status="done">
+          <div class="card-header">
+            <span class="card-title">Allow getUserInfo API for OpenAI</span>
+            <div class="card-meta"><span class="pill pill-done">DONE</span></div>
+          </div>
+        </div>
+        <div class="card" data-status="done">
+          <div class="card-header">
+            <span class="card-title">Merchant LIAM menu permissions</span>
+            <div class="card-meta"><span class="pill pill-done">DONE</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /section-content -->
+  </div><!-- /david -->
+
+  <div class="divider"></div>
+
+  <!-- ==================== NURI ==================== -->
+  <div class="person-section" data-person="nuri">
+    <button class="person-toggle" onclick="toggleSection(this)">
+      <span class="toggle-icon">&#9660;</span>
+      <span class="person-name">Nuri</span>
+      <span class="person-count" id="nuri-count"></span>
+    </button>
+
+    <div class="section-content">
+      <div class="section-label">Key Tasks</div>
+      <div class="cards" id="nuri-tasks">
+
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">WebKYC</span>
+            <div class="card-meta"><span class="pill pill-in-plan">IN PLAN</span></div>
+          </div>
+        </div>
+
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">BNPL Onboarding</span>
+            <div class="card-meta"><span class="pill pill-in-plan">IN PLAN</span></div>
+          </div>
+        </div>
+
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">Wallet Passthrough</span>
+            <div class="card-meta"><span class="pill pill-in-plan">IN PLAN</span></div>
+          </div>
+        </div>
+
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">Payment Binding Flow</span>
+            <div class="card-meta"><span class="pill pill-in-plan">IN PLAN</span></div>
+          </div>
+        </div>
+
+        <div class="card" data-status="in-plan" onclick="toggleCard(this)">
+          <div class="card-header">
+            <span class="card-title">Risk Management Service</span>
+            <div class="card-meta"><span class="pill pill-in-plan">IN PLAN</span></div>
+          </div>
+        </div>
+
+      </div><!-- /nuri-tasks -->
+
+      <div class="section-label">Security Reviews</div>
+      <p class="none-label">None</p>
+
+    </div><!-- /section-content -->
+  </div><!-- /nuri -->
+
+</div><!-- /page -->
+
+<script>
+  // --- Status filter ---
+  const statusMap = {
+    'all': null,
+    'not-yet': 'not-yet',
+    'in-plan': 'in-plan',
+    'in-dev': 'in-dev',
+    'in-qa': 'in-qa',
+    'done': 'done'
+  };
+
+  function getAllCards() {
+    return document.querySelectorAll('.card[data-status]');
+  }
+
+  function updateCounts() {
+    const cards = getAllCards();
+    const counts = { 'all': 0, 'not-yet': 0, 'in-plan': 0, 'in-dev': 0, 'in-qa': 0, 'done': 0 };
+    cards.forEach(c => {
+      const s = c.dataset.status;
+      counts['all']++;
+      if (counts[s] !== undefined) counts[s]++;
+    });
+    Object.keys(counts).forEach(k => {
+      const el = document.getElementById('count-' + k);
+      if (el) el.textContent = counts[k];
+    });
+  }
+
+  function applyFilter(status) {
+    const cards = getAllCards();
+    cards.forEach(c => {
+      if (!status || c.dataset.status === status) {
+        c.classList.remove('card-hidden');
+      } else {
+        c.classList.add('card-hidden');
+      }
+    });
+    // Update person visible counts
+    document.querySelectorAll('.person-section').forEach(section => {
+      const visible = section.querySelectorAll('.card[data-status]:not(.card-hidden)').length;
+      const countEl = section.querySelector('.person-count');
+      if (countEl) countEl.textContent = visible + ' tasks';
+    });
+  }
+
+  document.getElementById('filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilter(statusMap[btn.dataset.filter]);
+  });
+
+  // --- Card expand/collapse ---
+  function toggleCard(el) {
+    el.classList.toggle('expanded');
+  }
+
+  // --- Section collapse ---
+  function toggleSection(btn) {
+    btn.classList.toggle('collapsed');
+    const content = btn.nextElementSibling;
+    if (content) content.style.display = btn.classList.contains('collapsed') ? 'none' : '';
+  }
+
+  // --- Init ---
+  updateCounts();
+  applyFilter(null);
+</script>
+</body>
+</html>

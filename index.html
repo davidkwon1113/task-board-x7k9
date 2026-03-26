@@ -4,785 +4,301 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Task Board — PM Mode Change</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Task Board — Style Selector</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-/* ==========================================================================
-   Muji Kanban — Task Board
-   Mood: quiet authority
-   Palette: warm off-white + kraft brown accent
-   Typography: Cormorant Garamond (heading) + Inter (body)
-   Scale: perfect-fourth (1.333)
-   ========================================================================== */
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Inter', sans-serif;
-  color: #2C2C2C;
-  background: #F7F5F2;
-  line-height: 1.6;
-  letter-spacing: 0.02em;
-  -webkit-font-smoothing: antialiased;
+  background: #F5F5F4;
+  color: #1a1a1a;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
 }
 
-/* === Layout === */
-.page {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 48px 48px 80px;
+.container {
+  max-width: 880px;
+  width: 100%;
 }
 
-/* === Header === */
-.page-header {
+.header {
+  text-align: center;
   margin-bottom: 64px;
 }
 
-.page-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 2.369rem;
-  font-weight: 300;
-  line-height: 1.2;
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 400;
   letter-spacing: -0.01em;
   margin-bottom: 8px;
 }
 
-.page-meta {
-  font-size: 0.75rem;
-  color: #8C8680;
-  letter-spacing: 0.02em;
-}
-
-/* === Filter Bar === */
-.filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 48px;
-  flex-wrap: wrap;
-}
-
-.filter-label {
-  font-size: 0.75rem;
-  color: #8C8680;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-right: 4px;
-}
-
-.filter-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 0;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.75rem;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  color: #C0BAB2;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid transparent;
-  cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.filter-btn:hover {
-  color: #8C8680;
-}
-
-.filter-btn.active {
-  color: #8B7355;
-  border-bottom-color: #8B7355;
-}
-
-.filter-count {
-  color: #C0BAB2;
-  font-weight: 300;
-}
-
-.filter-btn.active .filter-count {
-  color: #8B7355;
-}
-
-/* === Person Section === */
-.person-section {
-  margin-bottom: 64px;
-}
-
-.person-header {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  margin-bottom: 32px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.person-name {
-  font-family: 'Inter', sans-serif;
-  font-size: 1.333rem;
-  font-weight: 400;
-  line-height: 1.3;
-  letter-spacing: 0em;
-}
-
-.person-count {
-  font-size: 0.75rem;
-  color: #8C8680;
-  letter-spacing: 0.02em;
-}
-
-.person-toggle {
-  font-size: 0.75rem;
-  color: #C0BAB2;
-  margin-left: auto;
-  transition: transform 0.2s ease;
-}
-
-.person-header.collapsed .person-toggle {
-  transform: rotate(-90deg);
-}
-
-/* === Section Label === */
-.section-label {
-  font-size: 0.75rem;
-  color: #8C8680;
-  letter-spacing: 0.02em;
-  margin-bottom: 24px;
-  padding-top: 8px;
-}
-
-/* === Task Cards === */
-.task-list {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 48px;
-}
-
-.task-card {
-  background: #FFFFFF;
-  border: 1px solid #E8E4DF;
-  border-radius: 0;
-  padding: 24px;
-  transition: background-color 0.15s ease;
-  cursor: default;
-  margin-top: -1px;
-}
-
-/* hover removed — paper does not react */
-
-.task-card.hidden {
-  display: none;
-}
-
-.task-card:first-child {
-  margin-top: 0;
-}
-
-.task-top {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 12px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  margin-top: 8px;
-}
-
-.status-not-yet    { background: #C4A882; }
-.status-in-plan    { background: #B8A88A; }
-.status-in-dev     { background: #7A9B8A; }
-.status-in-qa      { background: #8B7EA8; }
-.status-done       { background: #6B8FA3; }
-
-.task-title {
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.4;
-  flex: 1;
-}
-
-.task-schedule {
-  font-size: 0.75rem;
-  color: #8C8680;
-  flex-shrink: 0;
-  text-align: right;
-  white-space: nowrap;
-}
-
-.task-meta-row {
-  display: flex;
-  gap: 24px;
-  margin-bottom: 12px;
-  padding-left: 24px;
-}
-
-.task-meta-item {
-  font-size: 0.75rem;
-  color: #8C8680;
-  letter-spacing: 0.02em;
-}
-
-.task-meta-item span {
-  color: #2C2C2C;
-  font-weight: 400;
-}
-
-/* === Notes (expandable) === */
-.task-notes {
-  padding-left: 24px;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.25s ease;
-}
-
-.task-card.expanded .task-notes {
-  max-height: 500px;
-}
-
-.task-notes-inner {
-  padding-top: 16px;
-  border-top: 1px solid #E8E4DF;
+.header p {
   font-size: 0.8125rem;
-  color: #2C2C2C;
-  line-height: 1.8;
-}
-
-.task-notes-inner ul {
-  list-style: none;
-  padding: 0;
-}
-
-.task-notes-inner li {
-  padding-left: 16px;
-  position: relative;
-  margin-bottom: 4px;
-}
-
-.task-notes-inner li::before {
-  content: "·";
-  position: absolute;
-  left: 0;
-  color: #C0BAB2;
-}
-
-.task-notes-inner li li {
-  padding-left: 16px;
-}
-
-.task-notes-inner li li::before {
-  content: "–";
-  color: #C0BAB2;
-}
-
-.task-expand-hint {
-  font-size: 0.75rem;
-  color: #C0BAB2;
-  padding-left: 24px;
-  cursor: pointer;
+  color: #9a9a9a;
   letter-spacing: 0.02em;
 }
 
-.task-card.expanded .task-expand-hint {
-  display: none;
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
 }
 
-/* === Security Reviews === */
-.review-list {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 48px;
-}
-
-.review-card {
-  background: #FFFFFF;
-  border: 1px solid #E8E4DF;
-  border-radius: 0;
-  padding: 24px;
-  margin-top: -1px;
-}
-
-.review-card:first-child {
-  margin-top: 0;
-}
-
-.review-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.review-card.hidden {
-  display: none;
-}
-
-.review-title {
-  font-size: 0.875rem;
-  font-weight: 400;
-  flex: 1;
-  line-height: 1.5;
-}
-
-.review-link {
-  color: #8B7355;
+.card {
+  display: block;
   text-decoration: none;
-  border-bottom: 1px solid transparent;
+  color: inherit;
+  border: 1px solid #e5e5e3;
+  border-radius: 0;
+  overflow: hidden;
   transition: border-color 0.15s ease;
 }
 
-.review-link:hover {
-  border-bottom-color: #8B7355;
+.card:hover {
+  border-color: #b0b0ae;
 }
 
-/* summary bar removed — counts integrated into filters */
-
-/* === Empty State === */
-.empty-state {
-  padding: 40px 24px;
-  text-align: center;
-  font-size: 0.875rem;
-  color: #B8A88A;
+.card-preview {
+  height: 200px;
+  position: relative;
+  overflow: hidden;
 }
 
-/* === Footer === */
-.page-footer {
-  margin-top: 64px;
-  font-size: 0.75rem;
-  color: #C0BAB2;
+/* Muji Kanban preview */
+.preview-muji {
+  background: #F7F5F2;
+  padding: 20px;
+}
+
+.preview-muji .pm-title {
+  font-size: 0.625rem;
+  color: #8C8680;
+  margin-bottom: 12px;
   letter-spacing: 0.02em;
+}
+
+.preview-muji .pm-card {
+  background: #fff;
+  border: 1px solid #E8E4DF;
+  padding: 8px 10px;
+  margin-bottom: -1px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.preview-muji .pm-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.preview-muji .pm-text {
+  font-size: 0.5625rem;
+  color: #2C2C2C;
+}
+
+.preview-muji .pm-date {
+  font-size: 0.5rem;
+  color: #8C8680;
+  margin-left: auto;
+}
+
+/* Terminal Ops preview */
+.preview-terminal {
+  background: #0D1117;
+  padding: 16px;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+.preview-terminal .pt-line {
+  font-size: 0.5rem;
+  line-height: 1.8;
+  color: #8B949E;
+}
+
+.preview-terminal .pt-green { color: #3FB950; }
+.preview-terminal .pt-amber { color: #D29922; }
+.preview-terminal .pt-red { color: #F85149; }
+.preview-terminal .pt-blue { color: #58A6FF; }
+.preview-terminal .pt-white { color: #C9D1D9; }
+
+/* Notion Minimal preview */
+.preview-notion {
+  background: #FFFFFF;
+  padding: 20px;
+}
+
+.preview-notion .pn-title {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #37352F;
+  margin-bottom: 12px;
+}
+
+.preview-notion .pn-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #E3E2DE;
+}
+
+.preview-notion .pn-pill {
+  font-size: 0.4375rem;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.preview-notion .pn-text {
+  font-size: 0.5625rem;
+  color: #37352F;
+}
+
+.preview-notion .pn-meta {
+  font-size: 0.5rem;
+  color: #9B9A97;
+  margin-left: auto;
+}
+
+/* Card info */
+.card-info {
+  padding: 20px;
+  background: #fff;
+  border-top: 1px solid #e5e5e3;
+}
+
+.card-name {
+  font-size: 0.875rem;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.card-desc {
+  font-size: 0.75rem;
+  color: #9a9a9a;
+  line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+  .cards {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
+  }
 }
 </style>
 </head>
 <body>
 
-<div class="page">
-
-  <!-- Header -->
-  <header class="page-header">
-    <h1 class="page-title">Task Board</h1>
-    <p class="page-meta">PM Mode Change · LINE Pay Thailand</p>
-  </header>
-
-  <!-- Filters (counts integrated) -->
-  <div class="filter-bar" id="filterBar">
-    <button class="filter-btn active" data-filter="all">All <span class="filter-count"></span></button>
-    <button class="filter-btn" data-filter="not-yet">Not Yet <span class="filter-count"></span></button>
-    <button class="filter-btn" data-filter="in-plan">In Plan <span class="filter-count"></span></button>
-    <button class="filter-btn" data-filter="in-dev">In Dev <span class="filter-count"></span></button>
-    <button class="filter-btn" data-filter="in-qa">In QA <span class="filter-count"></span></button>
-    <button class="filter-btn" data-filter="done">Done <span class="filter-count"></span></button>
+<div class="container">
+  <div class="header">
+    <h1>Task Board</h1>
+    <p>PM Mode Change · LINE Pay Thailand</p>
   </div>
 
-  <!-- ==================== DAVID ==================== -->
-  <section class="person-section" data-person="david">
-    <div class="person-header" onclick="togglePerson(this)">
-      <h2 class="person-name">David</h2>
-      <span class="person-count" data-count-for="david"></span>
-      <span class="person-toggle">▾</span>
-    </div>
-    <div class="person-body">
+  <div class="cards">
 
-      <p class="section-label">Key Tasks</p>
-      <div class="task-list">
-
-        <!-- New Point Card -->
-        <div class="task-card" data-status="in-plan" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">New Point Card</span>
-            <span class="task-schedule">2026-08</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>Release new Kbank point card with new point revamp</span></span>
-            <span class="task-meta-item">KPI <span>Card AU 100,000</span></span>
-          </div>
-          <span class="task-expand-hint">details ›</span>
-          <div class="task-notes"><div class="task-notes-inner">
-            <ul>
-              <li>Under schedule fix with Kbank
-                <ul>
-                  <li>Have dependency with the report file format</li>
-                  <li>Need to check with LY NEON team about NEON I/F</li>
-                  <li>Finalize the UX flow to discuss with LINE MAN</li>
-                </ul>
-              </li>
-            </ul>
-          </div></div>
+    <!-- Muji Kanban -->
+    <a class="card" href="muji-kanban.html">
+      <div class="card-preview preview-muji">
+        <div class="pm-title">Key Tasks</div>
+        <div class="pm-card">
+          <span class="pm-dot" style="background:#B8A88A;"></span>
+          <span class="pm-text">New Point Card</span>
+          <span class="pm-date">2026-08</span>
         </div>
-
-        <!-- Core Separation: Risk Management -->
-        <div class="task-card" data-status="in-dev" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-in-dev"></span>
-            <span class="task-title">Core Separation — Risk Management</span>
-            <span class="task-schedule">2026-05</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>Separate risk management system with LIAM admin</span></span>
-            <span class="task-meta-item">KPI <span>On-time delivery</span></span>
-          </div>
-          <span class="task-expand-hint">details ›</span>
-          <div class="task-notes"><div class="task-notes-inner">
-            <ul>
-              <li>Under schedule fix
-                <ul>
-                  <li>DB release: done</li>
-                  <li>RC QA: 3rd–4th week of April 2026</li>
-                  <li>Go-live: May 2026</li>
-                </ul>
-              </li>
-            </ul>
-          </div></div>
+        <div class="pm-card">
+          <span class="pm-dot" style="background:#7A9B8A;"></span>
+          <span class="pm-text">Core Separation — Risk Mgmt</span>
+          <span class="pm-date">2026-05</span>
         </div>
-
-        <!-- Core Separation: Payfac/Cobrand/Salmon -->
-        <div class="task-card" data-status="in-dev" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-in-dev"></span>
-            <span class="task-title">Core Separation — Payfac / Cobrand / Salmon</span>
-            <span class="task-schedule">2026-04</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>Separate payfac/cobrand/salmon system</span></span>
-            <span class="task-meta-item">KPI <span>On-time delivery</span></span>
-          </div>
-          <span class="task-expand-hint">details ›</span>
-          <div class="task-notes"><div class="task-notes-inner">
-            <ul>
-              <li>Payfac/cobrand
-                <ul>
-                  <li>Cobrand IP/domain status — IP: beta done, real TBD · Domain: TBD</li>
-                </ul>
-              </li>
-              <li>Salmon — decided not to proceed with user communication</li>
-            </ul>
-          </div></div>
+        <div class="pm-card">
+          <span class="pm-dot" style="background:#7A9B8A;"></span>
+          <span class="pm-text">Core Separation — Payfac</span>
+          <span class="pm-date">2026-04</span>
         </div>
-
-        <!-- Core Separation: Settlement -->
-        <div class="task-card" data-status="in-plan" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">Core Separation — Settlement</span>
-            <span class="task-schedule">2026-06</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>Separate settlement system with LIAM admin</span></span>
-            <span class="task-meta-item">KPI <span>On-time delivery</span></span>
-          </div>
-          <span class="task-expand-hint">details ›</span>
-          <div class="task-notes"><div class="task-notes-inner">
-            <ul>
-              <li>Under review schedule
-                <ul>
-                  <li>Whether to include in central migration</li>
-                </ul>
-              </li>
-            </ul>
-          </div></div>
+        <div class="pm-card">
+          <span class="pm-dot" style="background:#B8A88A;"></span>
+          <span class="pm-text">Core Separation — Settlement</span>
+          <span class="pm-date">2026-06</span>
         </div>
-
-        <!-- Core Separation: Central -->
-        <div class="task-card" data-status="not-yet" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-not-yet"></span>
-            <span class="task-title">Core Separation — Central</span>
-            <span class="task-schedule">2026-09</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>Separate central = payment system with LIAM admin</span></span>
-            <span class="task-meta-item">KPI <span>On-time delivery</span></span>
-          </div>
+        <div class="pm-card">
+          <span class="pm-dot" style="background:#C4A882;"></span>
+          <span class="pm-text">Core Separation — Central</span>
+          <span class="pm-date">2026-09</span>
         </div>
-
-        <!-- Cross-Border Payment -->
-        <div class="task-card" data-status="in-plan" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">Cross-Border Payment</span>
-            <span class="task-schedule">2026-07</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>Apply traveler component to support cross-border payment</span></span>
-            <span class="task-meta-item">KPI <span>On-time delivery</span></span>
-          </div>
-          <span class="task-expand-hint">details ›</span>
-          <div class="task-notes"><div class="task-notes-inner">
-            <ul>
-              <li>Need to push LPP
-                <ul>
-                  <li>Suggest to sustain the current regkey payment</li>
-                </ul>
-              </li>
-            </ul>
-          </div></div>
-        </div>
-
-        <!-- Apple Hub -->
-        <div class="task-card" data-status="in-qa" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-in-qa"></span>
-            <span class="task-title">Apple Hub</span>
-            <span class="task-schedule">2026-04</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>Gaining LINE Pay GMV from Apple Store</span></span>
-            <span class="task-meta-item">KPI <span>TBD</span></span>
-          </div>
-          <span class="task-expand-hint">details ›</span>
-          <div class="task-notes"><div class="task-notes-inner">
-            <ul>
-              <li>Need to finish the Apple QA
-                <ul>
-                  <li>Related to mobile security banking features</li>
-                </ul>
-              </li>
-            </ul>
-          </div></div>
-        </div>
-
-        <!-- Adding UTS -->
-        <div class="task-card" data-status="in-plan" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">Adding UTS for Binding Flow</span>
-            <span class="task-schedule">2026-05</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>Know drop-off rate from LINE Pay client side</span></span>
-            <span class="task-meta-item">KPI <span>On-time delivery</span></span>
-          </div>
-          <span class="task-expand-hint">details ›</span>
-          <div class="task-notes"><div class="task-notes-inner">
-            <ul>
-              <li>Adding screen view is done</li>
-              <li>Will add events</li>
-              <li>Workflow check is done</li>
-              <li>Might be available to check by server API data</li>
-            </ul>
-          </div></div>
-        </div>
-
-        <!-- BIN Switching -->
-        <div class="task-card" data-status="in-plan" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">BIN Switching</span>
-            <span class="task-schedule">2026 Q4</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>System automatically selects cheaper MDR</span></span>
-            <span class="task-meta-item">KPI <span>Reduce 6M THB/year</span></span>
-          </div>
-          <span class="task-expand-hint">details ›</span>
-          <div class="task-notes"><div class="task-notes-inner">
-            <ul>
-              <li>Gaining requirement from commercial team
-                <ul>
-                  <li>Need to discuss with core payment engineers</li>
-                </ul>
-              </li>
-            </ul>
-          </div></div>
-        </div>
-
-        <!-- SAP Migration -->
-        <div class="task-card" data-status="in-plan" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">SAP Migration</span>
-            <span class="task-schedule">2027 Q1</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>Migration NEON → Accounting Hub / Payout</span></span>
-            <span class="task-meta-item">KPI <span>On-time delivery</span></span>
-          </div>
-          <span class="task-expand-hint">details ›</span>
-          <div class="task-notes"><div class="task-notes-inner">
-            <ul>
-              <li>Check the schedule with accounting team</li>
-            </ul>
-          </div></div>
-        </div>
-
-        <!-- Merchant Squad Sprint -->
-        <div class="task-card" data-status="in-plan" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">Merchant Squad Sprint</span>
-            <span class="task-schedule">2026-04</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>Apply sprint-based production to merchant squad</span></span>
-            <span class="task-meta-item">KPI <span>On-time delivery</span></span>
-          </div>
-          <span class="task-expand-hint">details ›</span>
-          <div class="task-notes"><div class="task-notes-inner">
-            <ul>
-              <li>Will have discussion with Chris &amp; Som</li>
-            </ul>
-          </div></div>
-        </div>
-
-        <!-- UX/UI Design Onboarding -->
-        <div class="task-card" data-status="in-plan" onclick="toggleCard(this)">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">UX/UI Design Onboarding</span>
-            <span class="task-schedule">2026-04</span>
-          </div>
-          <div class="task-meta-row">
-            <span class="task-meta-item">Goal <span>UX/UI workflow migration from LPP → LPK</span></span>
-            <span class="task-meta-item">KPI <span>TBD</span></span>
-          </div>
-        </div>
-
       </div>
-
-      <p class="section-label">Security Reviews</p>
-      <div class="review-list">
-
-        <div class="review-card" data-status="done">
-          <span class="status-dot status-done"></span>
-          <span class="review-title">Allow getUserInfo API for OpenAI</span>
-        </div>
-
-        <div class="review-card" data-status="done">
-          <span class="status-dot status-done"></span>
-          <span class="review-title">Merchant LIAM menu permissions</span>
-        </div>
-
+      <div class="card-info">
+        <p class="card-name">Muji Kanban</p>
+        <p class="card-desc">Quiet authority. Paper-form feel, extreme whitespace, muted earth tones.</p>
       </div>
+    </a>
 
-    </div>
-  </section>
-
-  <!-- ==================== NURI ==================== -->
-  <section class="person-section" data-person="nuri">
-    <div class="person-header" onclick="togglePerson(this)">
-      <h2 class="person-name">Nuri</h2>
-      <span class="person-count" data-count-for="nuri"></span>
-      <span class="person-toggle">▾</span>
-    </div>
-    <div class="person-body">
-
-      <p class="section-label">Key Tasks</p>
-      <div class="task-list">
-
-        <div class="task-card" data-status="in-plan">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">WebKYC</span>
-          </div>
-        </div>
-
-        <div class="task-card" data-status="in-plan">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">BNPL Onboarding</span>
-          </div>
-        </div>
-
-        <div class="task-card" data-status="in-plan">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">Wallet Passthrough</span>
-          </div>
-        </div>
-
-        <div class="task-card" data-status="in-plan">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">Payment Binding Flow</span>
-          </div>
-        </div>
-
-        <div class="task-card" data-status="in-plan">
-          <div class="task-top">
-            <span class="status-dot status-in-plan"></span>
-            <span class="task-title">Risk Management Service</span>
-          </div>
-        </div>
-
+    <!-- Terminal Ops -->
+    <a class="card" href="terminal-ops.html">
+      <div class="card-preview preview-terminal">
+        <div class="pt-line"><span class="pt-blue">$</span> <span class="pt-white">taskboard --user david</span></div>
+        <div class="pt-line"><span class="pt-green">[IN DEV]</span> Core Sep — Risk Mgmt <span class="pt-amber">2026-05</span></div>
+        <div class="pt-line"><span class="pt-green">[IN DEV]</span> Core Sep — Payfac <span class="pt-amber">2026-04</span></div>
+        <div class="pt-line"><span class="pt-amber">[IN PLAN]</span> New Point Card <span class="pt-amber">2026-08</span></div>
+        <div class="pt-line"><span class="pt-amber">[IN PLAN]</span> Cross-Border Payment <span class="pt-amber">2026-07</span></div>
+        <div class="pt-line"><span class="pt-red">[NOT YET]</span> Core Sep — Central <span class="pt-amber">2026-09</span></div>
+        <div class="pt-line">&nbsp;</div>
+        <div class="pt-line"><span class="pt-blue">12 tasks</span> | <span class="pt-green">2 dev</span> <span class="pt-amber">8 plan</span> <span class="pt-red">1 pending</span></div>
       </div>
-
-      <p class="section-label">Security Reviews</p>
-      <div class="review-list">
-        <div class="empty-state">No security reviews</div>
+      <div class="card-info">
+        <p class="card-name">Terminal Ops</p>
+        <p class="card-desc">Operational command. Monospace, dark theme, dense data, CLI aesthetic.</p>
       </div>
+    </a>
 
-    </div>
-  </section>
+    <!-- Notion Minimal -->
+    <a class="card" href="notion-minimal.html">
+      <div class="card-preview preview-notion">
+        <div class="pn-title">Task Board</div>
+        <div class="pn-row">
+          <span class="pn-pill" style="background:#FDECC8;color:#D9730D;">IN PLAN</span>
+          <span class="pn-text">New Point Card</span>
+          <span class="pn-meta">2026-08</span>
+        </div>
+        <div class="pn-row">
+          <span class="pn-pill" style="background:#DBEDDB;color:#0F7B6C;">IN DEV</span>
+          <span class="pn-text">Core Sep — Risk Mgmt</span>
+          <span class="pn-meta">2026-05</span>
+        </div>
+        <div class="pn-row">
+          <span class="pn-pill" style="background:#DBEDDB;color:#0F7B6C;">IN DEV</span>
+          <span class="pn-text">Core Sep — Payfac</span>
+          <span class="pn-meta">2026-04</span>
+        </div>
+        <div class="pn-row">
+          <span class="pn-pill" style="background:#E8DEEE;color:#6940A5;">IN QA</span>
+          <span class="pn-text">Apple Hub</span>
+          <span class="pn-meta">2026-04</span>
+        </div>
+        <div class="pn-row">
+          <span class="pn-pill" style="background:#FBE4E4;color:#E03E3E;">NOT YET</span>
+          <span class="pn-text">Core Sep — Central</span>
+          <span class="pn-meta">2026-09</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <p class="card-name">Notion Minimal</p>
+        <p class="card-desc">Quiet clarity. Notion database feel, colored pills, thin borders.</p>
+      </div>
+    </a>
 
-  <!-- Footer -->
-  <footer class="page-footer">
-    Task Board — PM Mode Change · Last synced from Confluence
-  </footer>
-
+  </div>
 </div>
-
-<script>
-/* === Filter === */
-const filterBtns = document.querySelectorAll('.filter-btn');
-filterBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    filterBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const filter = btn.dataset.filter;
-    document.querySelectorAll('.task-card, .review-card').forEach(card => {
-      if (filter === 'all' || card.dataset.status === filter) {
-        card.classList.remove('hidden');
-      } else {
-        card.classList.add('hidden');
-      }
-    });
-    updateCounts();
-  });
-});
-
-/* === Toggle card expand === */
-function toggleCard(card) {
-  if (!card.querySelector('.task-notes')) return;
-  card.classList.toggle('expanded');
-}
-
-/* === Toggle person section === */
-function togglePerson(header) {
-  header.classList.toggle('collapsed');
-  const body = header.nextElementSibling;
-  if (body) {
-    body.style.display = header.classList.contains('collapsed') ? 'none' : '';
-  }
-}
-
-/* === Counts === */
-function updateCounts() {
-  /* filter counts always show TOTAL regardless of active filter */
-  const allTotal = document.querySelectorAll('.task-card').length;
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    const f = btn.dataset.filter;
-    const count = f === 'all' ? allTotal : document.querySelectorAll(`.task-card[data-status="${f}"]`).length;
-    const span = btn.querySelector('.filter-count');
-    if (span) span.textContent = count;
-  });
-
-  /* person counts reflect visible cards */
-  document.querySelectorAll('[data-count-for]').forEach(el => {
-    const person = el.dataset.countFor;
-    const section = document.querySelector(`[data-person="${person}"]`);
-    const total = section.querySelectorAll('.task-card:not(.hidden)').length;
-    el.textContent = `${total} tasks`;
-  });
-}
-
-updateCounts();
-</script>
 
 </body>
 </html>
